@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Performance Report - Dec 28, 2025</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <!-- Testing Controls -->
+        <div style="background-color: #ffffff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3 style="margin: 0 0 15px 0;">Test with Live Data</h3>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">API Endpoint:</label>
+                <input type="text" id="apiEndpoint" value="http://localhost:8000/api/daily-metrics" 
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Report Date:</label>
+                <input type="date" id="reportDate" value="2025-12-28" 
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            <button onclick="fetchLiveData()" 
+                style="background-color: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                Load Live Data
+            </button>
+            <span id="loadingStatus" style="margin-left: 10px; color: #64748b;"></span>
+        </div>
+
+        <!-- Email Report Preview -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <!-- Header -->
+            <tr>
+                <td style="background-color: #2563eb; padding: 30px; text-align: center;">
+                    <h1 style="margin: 0; color: #ffffff; font-size: 24px;">Daily Performance Report</h1>
+                    <p id="reportDateDisplay" style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px;">December 28, 2025</p>
+                </td>
+            </tr>
+            
+            <!-- Metrics Section -->
+            <tr>
+                <td style="padding: 30px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                        <!-- Total Revenue -->
+                        <tr>
+                            <td style="padding: 20px; background-color: #f0f9ff; border-radius: 6px;">
+                                <p style="margin: 0; font-size: 14px; color: #64748b; font-weight: 600;">TOTAL REVENUE</p>
+                                <p id="totalRevenue" style="margin: 10px 0 0 0; font-size: 32px; color: #1e293b; font-weight: bold;">$12,547.85</p>
+                            </td>
+                        </tr>
+                        
+                        <tr><td style="height: 15px;"></td></tr>
+                        
+                        <!-- Total Transactions -->
+                        <tr>
+                            <td style="padding: 20px; background-color: #f0fdf4; border-radius: 6px;">
+                                <p style="margin: 0; font-size: 14px; color: #64748b; font-weight: 600;">TOTAL TRANSACTIONS</p>
+                                <p id="totalTransactions" style="margin: 10px 0 0 0; font-size: 32px; color: #1e293b; font-weight: bold;">87</p>
+                            </td>
+                        </tr>
+                        
+                        <tr><td style="height: 15px;"></td></tr>
+                        
+                        <!-- New Customers -->
+                        <tr>
+                            <td style="padding: 20px; background-color: #fef3c7; border-radius: 6px;">
+                                <p style="margin: 0; font-size: 14px; color: #64748b; font-weight: 600;">NEW CUSTOMERS ADDED</p>
+                                <p id="newCustomers" style="margin: 10px 0 0 0; font-size: 32px; color: #1e293b; font-weight: bold;">23</p>
+                            </td>
+                        </tr>
+                        
+                        <tr><td style="height: 15px;"></td></tr>
+                        
+                        <!-- Items Sold -->
+                        <tr>
+                            <td style="padding: 20px; background-color: #fce7f3; border-radius: 6px;">
+                                <p style="margin: 0; font-size: 14px; color: #64748b; font-weight: 600;">TOTAL ITEMS SOLD</p>
+                                <p id="itemsSold" style="margin: 10px 0 0 0; font-size: 32px; color: #1e293b; font-weight: bold;">342</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            
+            <!-- Footer -->
+            <tr>
+                <td style="background-color: #f8fafc; padding: 20px; text-align: center;">
+                    <p style="margin: 0; font-size: 12px; color: #64748b;">
+                        This is an automated daily report generated at 10:00 PM EST
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        async function fetchLiveData() {
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+            const reportDate = document.getElementById('reportDate').value;
+            const statusEl = document.getElementById('loadingStatus');
+            
+            statusEl.textContent = 'Loading...';
+            statusEl.style.color = '#2563eb';
+            
+            try {
+                const response = await fetch(`${apiEndpoint}?report_date=${reportDate}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update the dashboard with live data
+                document.getElementById('totalRevenue').textContent = 
+                    '$' + parseFloat(data.total_revenue).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('totalTransactions').textContent = data.total_transactions;
+                document.getElementById('newCustomers').textContent = data.new_customers;
+                document.getElementById('itemsSold').textContent = data.items_sold;
+                
+                // Update date display
+                const dateObj = new Date(reportDate);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                document.getElementById('reportDateDisplay').textContent = formattedDate;
+                
+                statusEl.textContent = ' Data loaded successfully!';
+                statusEl.style.color = '#10b981';
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                statusEl.textContent = '✗ Error: ' + error.message;
+                statusEl.style.color = '#ef4444';
+            }
+        }
+    </script>
+</body>
+</html>
